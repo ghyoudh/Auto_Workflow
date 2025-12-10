@@ -1,0 +1,343 @@
+{
+  "name": "My workflow 2",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "News",
+        "formDescription": "news detection ",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "what is your name? ",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Tell me about your feedback?",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.3,
+      "position": [
+        -384,
+        -32
+      ],
+      "id": "3299bc09-7d51-4c41-bbc0-0ed7db47f83f",
+      "name": "On form submission",
+      "webhookId": "f18cabf5-602a-47dc-9180-2a5e6e144199"
+    },
+    {
+      "parameters": {
+        "inputText": "={{ $json['Tell me about your feedback?'] }}",
+        "options": {
+          "systemPromptTemplate": "You are highly intelligent and accurate sentiment analyzer. Analyze the sentiment of the provided text. Categorize it into one of the following: {categories}. Use the provided formatting instructions. Only output the JSON."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.sentimentAnalysis",
+      "typeVersion": 1.1,
+      "position": [
+        -176,
+        -32
+      ],
+      "id": "2ae76617-3f59-4b8c-a021-2b660463d8eb",
+      "name": "Sentiment Analysis"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        176
+      ],
+      "id": "12b8ca3c-2c59-48c2-bd15-30ad09134574",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "3YtkUomA0oNfB4Sd",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1-dINnyMbX3_n3nzqKHC0tIEnACrAx1Xg7fyon0fFwJA",
+          "mode": "list",
+          "cachedResultName": "news ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-dINnyMbX3_n3nzqKHC0tIEnACrAx1Xg7fyon0fFwJA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-dINnyMbX3_n3nzqKHC0tIEnACrAx1Xg7fyon0fFwJA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "name ": "={{ $json['what is your name? '] }}",
+            "feedback ": "={{ $json.sentimentAnalysis.category }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "name ",
+              "displayName": "name ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "feedback ",
+              "displayName": "feedback ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        -64
+      ],
+      "id": "72c6126e-5685-4e89-bd5a-a870d6c540d4",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PePLw7UFDoXYNnuQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1-dINnyMbX3_n3nzqKHC0tIEnACrAx1Xg7fyon0fFwJA",
+          "mode": "list",
+          "cachedResultName": "news ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-dINnyMbX3_n3nzqKHC0tIEnACrAx1Xg7fyon0fFwJA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1-dINnyMbX3_n3nzqKHC0tIEnACrAx1Xg7fyon0fFwJA/edit#gid=0"
+        },
+        "event": "rowAdded",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        416
+      ],
+      "id": "6961edb6-bd1c-45c3-85a4-f82fe7c44da3",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "02PFYKkguN1AE7hA",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bb5166de-5ca1-4593-9ec2-1412f13bfd30",
+              "leftValue": "={{ $json['feedback '] }}",
+              "rightValue": "Positive",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        416
+      ],
+      "id": "9c29e1df-4319-4a25-a046-25b8e7cf2173",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "ghyoudh111@gmail.com",
+        "subject": "Negative Massage ",
+        "message": "={{ $json['name '] }} has a negatine massage ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -16,
+        512
+      ],
+      "id": "1eb783aa-114a-42f2-b955-f9b5b446b378",
+      "name": "Send a message",
+      "webhookId": "05afaa41-8068-4a09-bbe3-1f502f093a85",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fsRtHgflIV725Ffq",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "ghyoudh111@gmail.com",
+        "subject": "hello",
+        "message": "positive ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -32,
+        352
+      ],
+      "id": "2930cf2d-cc7f-4d07-a3f0-e47b718f449b",
+      "name": "Send a message1",
+      "webhookId": "f27b08cb-4928-4701-85b5-c5548a98a8bc",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "fsRtHgflIV725Ffq",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Sentiment Analysis",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sentiment Analysis": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d812f265-7b99-4e3a-9c5e-39e0b8a68d20",
+  "meta": {
+    "instanceId": "36c3a2e4531ac8f112a206cd0e57fdb25fc7f941bf86c11d683cdb10c51c3c26"
+  },
+  "id": "HuPS8fOnYCLEnMlm",
+  "tags": []
+}
